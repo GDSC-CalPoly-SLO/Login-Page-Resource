@@ -3,10 +3,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "../firebaseAppInit.js";
+import { auth } from "../../firebaseAppInit.js";
 import { useState } from "react";
 
-export default function LoginPage({ setPage }) {
+export default function LoginPage({ setPage, setUser }) {
   const [email, setEmail] = useState("");
   const [pswd, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -15,15 +15,23 @@ export default function LoginPage({ setPage }) {
   const handleSignIn = async () => {
     if (!signup) {
       try {
-        await signInWithEmailAndPassword(auth, email, pswd);
-        setPage("home");
+        await signInWithEmailAndPassword(auth, email, pswd)
+          .then(() => {
+            setUser(auth.currentUser);
+            setPage("home");
+          });
+        
+        
       } catch (error) {
         alert(error);
       }
     } else {
       try {
-        await createUserWithEmailAndPassword(auth, email, pswd);
-        setPage("home");
+        await createUserWithEmailAndPassword(auth, email, pswd)
+        .then(() => {
+          setUser(auth.currentUser);
+          setPage("home");
+        });
       } catch {
         alert("Did not work");
       }
@@ -45,7 +53,6 @@ export default function LoginPage({ setPage }) {
       ) : null}
       <input
         onChange={(e) => {
-          console.log(e.target.value);
           setEmail(e.target.value);
         }}
         type="email"
